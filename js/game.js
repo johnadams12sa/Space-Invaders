@@ -1,4 +1,3 @@
-//will add comments soon!
 const KEY_CODE_LEFT = 37;
 const KEY_CODE_RIGHT = 39;
 const KEY_CODE_SPACE = 32;
@@ -15,7 +14,11 @@ const ENEMIES_PER_ROW = 10;
 const ENEMY_HORIZONTAL_PADDING = 80;
 const ENEMY_VERTICAL_PADDING = 70;
 const ENEMY_VERTICAL_SPACING = 80;
-const ENEMY_COOLDOWN = 5.0;
+const ENEMY_COOLDOWN = 9.0;
+//added POINT_VALUE and global var score
+const POINT_VALUE = 1;
+
+var score = 0;
 
 const GAME_STATE = {
   lastTime: Date.now(),
@@ -29,6 +32,7 @@ const GAME_STATE = {
   enemies: [],
   enemyLasers: [],
   gameOver: false
+
 };
 
 function rectsIntersect(r1, r2) {
@@ -64,7 +68,7 @@ function createPlayer($container) {
   GAME_STATE.playerX = GAME_WIDTH / 2;
   GAME_STATE.playerY = GAME_HEIGHT - 50;
   const $player = document.createElement("img");
-  $player.src = "img/player-blue-1.png";
+  $player.src = "img/student2.png";
   $player.className = "player";
   $container.appendChild($player);
   setPosition($player, GAME_STATE.playerX, GAME_STATE.playerY);
@@ -105,12 +109,12 @@ function updatePlayer(dt, $container) {
 
 function createLaser($container, x, y) {
   const $element = document.createElement("img");
-  $element.src = "img/laser-blue-1.png";
+  $element.src = "img/diploma.png";
   $element.className = "laser";
   $container.appendChild($element);
   const laser = { x, y, $element };
   GAME_STATE.lasers.push(laser);
-  const audio = new Audio("sound/sfx-laser1.ogg");
+  const audio = new Audio("sound/whoosh.wav");
   audio.play();
   setPosition($element, x, y);
 }
@@ -133,6 +137,7 @@ function updateLasers(dt, $container) {
       if (rectsIntersect(r1, r2)) {
         // Enemy was hit
         destroyEnemy($container, enemy);
+        document.querySelector(".score").innerHTML = score;
         destroyLaser($container, laser);
         break;
       }
@@ -148,7 +153,7 @@ function destroyLaser($container, laser) {
 
 function createEnemy($container, x, y) {
   const $element = document.createElement("img");
-  $element.src = "img/enemy-blue-1.png";
+  $element.src = "img/teacher.png";
   $element.className = "enemy";
   $container.appendChild($element);
   const enemy = {
@@ -183,11 +188,13 @@ function updateEnemies(dt, $container) {
 function destroyEnemy($container, enemy) {
   $container.removeChild(enemy.$element);
   enemy.isDead = true;
+  score = score + POINT_VALUE;
+  //console.log(score);
 }
 
 function createEnemyLaser($container, x, y) {
   const $element = document.createElement("img");
-  $element.src = "img/laser-red-5.png";
+  $element.src = "img/pencil3.png";
   $element.className = "enemy-laser";
   $container.appendChild($element);
   const laser = { x, y, $element };
@@ -239,6 +246,7 @@ function update(e) {
   const currentTime = Date.now();
   const dt = (currentTime - GAME_STATE.lastTime) / 1000.0;
 
+
   if (GAME_STATE.gameOver) {
     document.querySelector(".game-over").style.display = "block";
     return;
@@ -256,10 +264,15 @@ function update(e) {
   updateEnemyLasers(dt, $container);
 
   GAME_STATE.lastTime = currentTime;
+
   window.requestAnimationFrame(update);
 }
 
 function onKeyDown(e) {
+
+
+
+
   if (e.keyCode === KEY_CODE_LEFT) {
     GAME_STATE.leftPressed = true;
   } else if (e.keyCode === KEY_CODE_RIGHT) {
@@ -279,7 +292,10 @@ function onKeyUp(e) {
   }
 }
 
+
+
 init();
 window.addEventListener("keydown", onKeyDown);
 window.addEventListener("keyup", onKeyUp);
+window.requestAnimationFrame(update);
 window.requestAnimationFrame(update);
